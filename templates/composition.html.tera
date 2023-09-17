@@ -1,0 +1,44 @@
+{% extends "base" %}
+
+
+{% block content %}
+<h3><a href="/">Go back</a></h3>
+
+<h1>{{ data.name }}</h1>
+<p>
+	{% if data.contribution.type is matching('composition') %}
+	Composed and written by <a href="/{{ data.author.id | trim_start_matches(pat='@') }}">{{ data.author.name }}</a>
+	{% else %}
+	{{ data.contribution.type | capitalize }} by <a href="/{{ data.author.id | trim_start_matches(pat='@') }}">{{
+		data.author.name }}</a> after <a href="/{{ data.contribution.id | trim_start_matches(pat='@') }}">{{
+		data.contribution.name }}</a>
+	{% endif %}
+</p>
+
+<ul>
+	<li>Text: <a href="/{{ data.text.id | trim_start_matches(pat='@') }}">{{data.text.name }}</a></li>
+	<li>Category: {{ data.category.name }}</li>
+	<li>Tags: {{ data.tags }} </li>
+</ul>
+
+<h2>Publications ({{ data.publications | length }})</h2>
+<ul>
+	{% for p in data.publications %}
+	<li>
+		<a href="/{{ p.into.id | trim_start_matches(pat='@') }}">{{ p.into.name }}</a>, page {{ p.page }}
+	</li>
+	{% endfor %}
+</ul>
+
+<h2>Performances ({{ data.performances | length }})</h2>
+<ul>
+	{% for p in data.performances %}
+	<li>
+		{{ p.link.kind | capitalize }}: <a href="{{ p.link.url | trim_start_matches(pat='@') }}">{{ p.link.url }}</a>
+		by
+		<a href="/{{ p.performer.id | trim_start_matches(pat='@') }}">{{ p.performer.name }}</a>
+	</li>
+	{% endfor %}
+</ul>
+
+{% endblock content %}

@@ -1,0 +1,4 @@
+[submodule "cufarul"]
+	path = cufarul
+	url = https://github.com/ByzantineWorks/cufarul.git
+	branch = feature/initial-model-v2
