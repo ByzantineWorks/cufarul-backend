@@ -1,0 +1,16 @@
+{% extends "base" %}
+
+
+{% block content %}
+<h3><a href="/">Go back</a></h3>
+
+<h1>{{ data.name }}</h1>
+Browse compositions in this mode.
+
+<ul>
+	{% for c in data.compositions %}
+	<li><a href="/{{ c.id | trim_start_matches(pat='@') }}">{{ c.name }}</a></li>
+	{% endfor %}
+</ul>
+
+{% endblock content %}

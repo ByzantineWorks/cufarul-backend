@@ -25,4 +25,11 @@
 	{% endfor %}
 </ul>
 
+<h2>Modes</h2>
+<ul>
+	{% for mode in data.modes %}
+	<li><a href="/modes/{{ mode.index }}">{{ mode.name }}</a> ({{ mode.compositions | length }} compositions)</li>
+	{% endfor %}
+</ul>
+
 {% endblock content %}

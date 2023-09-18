@@ -2,7 +2,7 @@
 extern crate rocket;
 use cufarul::{
     db::Database,
-    model::{CollectionKey, CompositionRepr, PersonRepr, TextRepr},
+    model::{CollectionKey, CompositionRepr, ModeRepr, PersonRepr, TextRepr},
     repo::{Cufarul, Repository},
 };
 use rocket::State;
@@ -20,6 +20,7 @@ fn index(state: &State<AppState>) -> Template {
         compositions: Vec<CompositionRepr>,
         composers: Vec<PersonRepr>,
         texts: Vec<TextRepr>,
+        modes: Vec<ModeRepr>,
     }
 
     let composition = state.repo.compositions(None);
@@ -31,12 +32,15 @@ fn index(state: &State<AppState>) -> Template {
         .filter(|elem| elem.compositions.len() > 0)
         .collect();
 
+    let modes = state.repo.modes();
+
     Template::render(
         "index",
         context! { count: state.repo.db().nodes_iter().count(), data: Context {
             compositions: composition,
             composers: composers,
             texts: texts,
+            modes: modes.into_values().collect(),
         }},
     )
 }
@@ -81,6 +85,13 @@ fn publications(id: String, state: &State<AppState>) -> Template {
     Template::render("publication", context! { data: data })
 }
 
+#[get("/modes/<id>")]
+fn modes(id: u8, state: &State<AppState>) -> Template {
+    assert!(id >= 1 && id <= 8);
+    let data = state.repo.modes().get(&id).expect("ofof").to_owned();
+    Template::render("mode", context! { data: data })
+}
+
 #[launch]
 fn launch() -> _ {
     let mut repo = cufarul::repo::CufarulRepository::from_spec(
@@ -99,7 +110,7 @@ fn launch() -> _ {
     rocket::build()
         .mount(
             "/",
-            routes![index, compositions, people, texts, publications],
+            routes![index, compositions, people, texts, publications, modes],
         )
         .attach(Template::fairing())
         .manage(state)
