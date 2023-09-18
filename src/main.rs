@@ -78,7 +78,7 @@ fn publications(id: String, state: &State<AppState>) -> Template {
         .model_by_id(CollectionKey::Publication(id.into()), None)
         .expect("Sf");
 
-    Template::render("text", context! { data: data })
+    Template::render("publication", context! { data: data })
 }
 
 #[launch]
