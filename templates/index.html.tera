@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Welcome to the Byzantine Music Database</h1>
-<p>We currently have {{count}} data entries.</p>
+<p>We currently have {{count}} data entries you can <a href="/search">search</a> through or browse below.</p>
 
 <h2>Composition ({{ data.compositions | length }})</h2>
 <ul>

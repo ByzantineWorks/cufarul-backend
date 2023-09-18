@@ -1,0 +1,103 @@
+{% extends "base" %}
+
+
+{% block content %}
+<h1>Interactive search</h1>
+<form action="">
+	<label for="query">Search: </label><input type="text" name="query" id="query">
+</form>
+<br>
+<div id="results">
+	<p>Results will show up here once you start typing.</p>
+</div>
+
+<script>
+	function get_collection_from_id(id) {
+		return id.split("/")[0].slice(1)
+	}
+
+	function get_id(id) {
+		return id.split("/")[1]
+	}
+
+	function capitalize(str) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
+	function no_results(msg) {
+		root = document.getElementById("results");
+		root.innerHTML = ""
+
+		res = document.createElement("p");
+		res.innerText = msg
+
+		root.appendChild(res)
+	}
+
+	function populate_results(map) {
+		root = document.getElementById("results");
+		root.innerHTML = ""
+
+		map.forEach(function (data, collection) {
+			if (data.length == 0) return;
+
+			label = document.createElement("h2");
+			label.innerText = capitalize(collection) + " (" + data.length + ")";
+
+			list = document.createElement("ul");
+			data.forEach(function (entry) {
+				item = document.createElement("li");
+				link = document.createElement("a");
+
+				link.innerText = entry.name;
+				link.href = "/" + entry.id.slice(1);
+
+				item.appendChild(link);
+				list.appendChild(item);
+			});
+
+			root.appendChild(label);
+			root.appendChild(list);
+		});
+	}
+
+	function update_results(data) {
+		if (data.length == 0) {
+			no_results("No results, keep typing.");
+			return;
+		}
+
+		map = new Map([
+			["compositions", []],
+			["texts", []],
+			["people", []],
+			["publications", []],
+			["taxonomies", []]
+		]);
+
+		data.forEach(function (item) {
+			map.get(get_collection_from_id(item.id)).push(item);
+		});
+
+		populate_results(map);
+	}
+
+	const input = document.getElementById("query");
+	input.addEventListener('input', function (e) {
+		query = this.value;
+		if (query.length < 3) {
+			no_results("Results will show up here once you start typing.")
+			return;
+		}
+
+		var request = new XMLHttpRequest();
+		request.onreadystatechange = function () {
+			if (request.readyState == 4 && request.status == 200) {
+				update_results(JSON.parse(request.responseText).results)
+			}
+		};
+		request.open("POST", "/search?query=" + query, true);
+		request.send(null);
+	});
+</script>
+{% endblock content %}

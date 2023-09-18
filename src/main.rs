@@ -1,11 +1,13 @@
 #[macro_use]
 extern crate rocket;
+use std::io::Cursor;
+
 use cufarul::{
     db::Database,
-    model::{CollectionKey, CompositionRepr, ModeRepr, PersonRepr, TextRepr},
+    model::{CollectionKey, CompositionRepr, ModeRepr, ModelRepr, PersonRepr, TextRepr},
     repo::{Cufarul, Repository},
 };
-use rocket::State;
+use rocket::{http::ContentType, response::Responder, Response, State};
 use rocket_dyn_templates::{context, Template};
 use serde::Serialize;
 
@@ -92,6 +94,40 @@ fn modes(id: u8, state: &State<AppState>) -> Template {
     Template::render("mode", context! { data: data })
 }
 
+#[get("/search")]
+fn search() -> Template {
+    Template::render("search", context! {})
+}
+
+#[derive(Serialize)]
+struct QueryResponse {
+    results: Vec<Box<dyn ModelRepr>>,
+}
+
+impl<'o> Responder<'o, 'static> for QueryResponse {
+    fn respond_to(self, _request: &'o rocket::Request<'_>) -> rocket::response::Result<'static> {
+        let res = serde_json::to_string(&self).expect("sff");
+        Response::build()
+            .header(ContentType::JSON)
+            .sized_body(res.len(), Cursor::new(res))
+            .ok()
+    }
+}
+
+#[post("/search?<query>&<collection>")]
+fn search_post(
+    query: String,
+    collection: Option<String>,
+    state: &State<AppState>,
+) -> QueryResponse {
+    let res = QueryResponse {
+        results: state.repo.query(collection, query),
+    };
+
+    // Json(res)
+    res
+}
+
 #[launch]
 fn launch() -> _ {
     let mut repo = cufarul::repo::CufarulRepository::from_spec(
@@ -110,7 +146,16 @@ fn launch() -> _ {
     rocket::build()
         .mount(
             "/",
-            routes![index, compositions, people, texts, publications, modes],
+            routes![
+                index,
+                compositions,
+                people,
+                texts,
+                publications,
+                modes,
+                search,
+                search_post,
+            ],
         )
         .attach(Template::fairing())
         .manage(state)
