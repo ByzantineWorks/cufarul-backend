@@ -2,6 +2,8 @@
 
 
 {% block content %}
+<h3><a href="/">Go back</a></h3>
+
 <h1>Interactive search</h1>
 <form action="">
 	<label for="query">Search: </label><input type="text" name="query" id="query">
