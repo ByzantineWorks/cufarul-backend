@@ -51,7 +51,7 @@
 				item = document.createElement("li");
 				link = document.createElement("a");
 
-				link.innerText = entry.name;
+				link.innerText = entry.name || entry.variants["@"].name;
 				link.href = "/" + entry.id.slice(1);
 
 				item.appendChild(link);

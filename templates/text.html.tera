@@ -4,14 +4,61 @@
 {% block content %}
 <h3><a href="/">Go back</a></h3>
 
-<h1>{{ data.name }}</h1>
+<h1>{{ data.variants["@"].name }}</h1>
 
-<h2>Compositions based on this text ({{ data.compositions | length }})</h2>
+{% set_global compositions_count = 0 %}
+{% set_global subtexts_count = 0 %}
+{% for v, d in data.variants %}
+{% set len = d.compositions | length %}
+{% set_global compositions_count = compositions_count + len %}
+
+{% set len = d.subtexts | length %}
+{% set_global subtexts_count = subtexts_count + len %}
+{% endfor %}
+
+<h2>Compositions based on this text ({{ compositions_count }})</h2>
 <ul>
-	{% for c in data.compositions %}
+	{% for c in data.variants["@"].compositions %}
 	<li>
 		<a href="/{{ c.id | trim_start_matches(pat='@') }}">{{ c.name }}</a>
 	</li>
 	{% endfor %}
 </ul>
+
+{% for v, d in data.variants %}
+{% if v != "@" %}
+<h3>{{ d.name }}</h3>
+<ul>
+	{% for c in d.compositions %}
+	<li>
+		<a href="/{{ c.id | trim_start_matches(pat='@') }}">{{ c.name }}</a>
+	</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endfor %}
+
+<h2>Parts of this text ({{ subtexts_count }})</h2>
+<ul>
+	{% for c in data.variants["@"].subtexts %}
+	<li>
+		<a href="/{{ c.id | trim_start_matches(pat='@') }}">{{ c.variants["@"].name }}</a>
+	</li>
+	{% endfor %}
+</ul>
+
+
+{% for v, d in data.variants %}
+{% if v != "@" %}
+<h3>{{ d.name }}</h3>
+<ul>
+	{% for c in d.subtexts %}
+	<li>
+		<a href="/{{ c.id | trim_start_matches(pat='@') }}">{{ c.variants["@"].name }}</a>
+	</li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% endfor %}
+
 {% endblock content %}

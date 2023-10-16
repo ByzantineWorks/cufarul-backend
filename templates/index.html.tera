@@ -14,7 +14,7 @@
 <h2>Texts ({{ data.texts | length }})</h2>
 <ul>
 	{% for c in data.texts %}
-	<li><a href="/{{ c.id | trim_start_matches(pat='@') }}">{{ c.name }}</a></li>
+	<li><a href="/{{ c.id | trim_start_matches(pat='@') }}">{{ c.variants["@"].name }}</a></li>
 	{% endfor %}
 </ul>
 

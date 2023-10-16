@@ -18,7 +18,9 @@
 <ul>
 	<li>Mode: <a href="/modes/{{ data.musical.index }}">{{ data.musical.mode }}</a>, with base in {{ data.musical.base }}
 	</li>
-	<li>Text: <a href=" /{{ data.text.id | trim_start_matches(pat='@' ) }}">{{data.text.name }}</a></li>
+	<li>Text: <a
+			href=" /{{ data.text.text.id | trim_start_matches(pat='@' ) }}">{{data.text.text.variants[data.text.variant].name
+			}}</a></li>
 	<li>Category: {{ data.category.name }}</li>
 	<li>Tags: {{ data.tags }} </li>
 </ul>
